@@ -17,6 +17,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.nifcloud.mbaas.core.DoneCallback;
 import com.nifcloud.mbaas.core.LoginCallback;
 import com.nifcloud.mbaas.core.NCMBException;
 import com.nifcloud.mbaas.core.NCMBUser;
@@ -33,6 +34,8 @@ public class LoginActivity extends AppCompatActivity {
         final EditText usernameEditText = findViewById(R.id.username);
         final EditText passwordEditText = findViewById(R.id.password);
         final Button loginButton = findViewById(R.id.login);
+        final Button signupButton = findViewById(R.id.signup);
+        final Button autoLogin = findViewById(R.id.autoLogin);
         final Button socialLogin = findViewById(R.id.socialLogin);
         final ProgressBar loadingProgressBar = findViewById(R.id.loading);
 
@@ -59,6 +62,7 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 loginButton.setEnabled(usernameEditText.getText().length() > 0 && passwordEditText.getText().length() > 0);
+                signupButton.setEnabled(usernameEditText.getText().length() > 0 && passwordEditText.getText().length() > 0);
                 return false;
             }
         });
@@ -84,12 +88,12 @@ public class LoginActivity extends AppCompatActivity {
                             NCMBUser.loginWithMailAddressInBackground(userName, password, new LoginCallback() {
                                 @Override
                                 public void done(NCMBUser ncmbUser, NCMBException e) {
+                                    loadingProgressBar.setVisibility(View.GONE);
                                     if (e == null) {
                                         finish();
                                     } else {
-                                        Utils.createErrorDialog(context, "", e.getMessage());
+                                        Utils.createErrorDialog(context, "", e.getMessage()).show();
                                     }
-                                    loadingProgressBar.setVisibility(View.GONE);
                                 }
                             });
 
@@ -97,12 +101,12 @@ public class LoginActivity extends AppCompatActivity {
                             NCMBUser.loginInBackground(userName, password, new LoginCallback() {
                                 @Override
                                 public void done(NCMBUser ncmbUser, NCMBException e) {
+                                    loadingProgressBar.setVisibility(View.GONE);
                                     if (e == null) {
                                         finish();
                                     } else {
-                                        Utils.createErrorDialog(context,"", e.getMessage());
+                                        Utils.createErrorDialog(context, "", e.getMessage()).show();
                                     }
-                                    loadingProgressBar.setVisibility(View.GONE);
                                 }
                             });
                         }
@@ -110,6 +114,65 @@ public class LoginActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 }
+            }
+        });
+
+        signupButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String userName = usernameEditText.getText().toString();
+                String password = passwordEditText.getText().toString();
+                if (userName.length() > 0) {
+                    loadingProgressBar.setVisibility(View.VISIBLE);
+
+                    if (Utils.isEmailFormat(userName)) {
+                        NCMBUser.requestAuthenticationMailInBackground(userName, new DoneCallback() {
+                            @Override
+                            public void done(NCMBException e) {
+                                loadingProgressBar.setVisibility(View.GONE);
+                                if (e != null) {
+                                    Utils.createErrorDialog(context, "", e.getMessage()).show();
+                                } else {
+                                    Utils.createErrorDialog(context, "", "Sign up success! Please confirm from your mailbox").show();
+                                }
+                            }
+                        });
+                    } else {
+                        NCMBUser user = new NCMBUser();
+                        user.setUserName(userName);
+                        user.setPassword(password);
+                        user.signUpInBackground(new DoneCallback() {
+                            @Override
+                            public void done(NCMBException e) {
+                                loadingProgressBar.setVisibility(View.GONE);
+                                if (e != null) {
+                                    Utils.createErrorDialog(context, "", e.getMessage()).show();
+                                } else {
+                                    Utils.createErrorDialog(context, "", "Signup success! Please Signin to continue!").show();
+                                }
+                            }
+                        });
+                    }
+
+                }
+            }
+        });
+
+        autoLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                loadingProgressBar.setVisibility(View.VISIBLE);
+                NCMBUser.loginWithAnonymousInBackground(new LoginCallback() {
+                    @Override
+                    public void done(NCMBUser ncmbUser, NCMBException e) {
+                        loadingProgressBar.setVisibility(View.GONE);
+                        if (e == null) {
+                            finish();
+                        } else {
+                            Utils.createErrorDialog(context, "", e.getMessage()).show();
+                        }
+                    }
+                });
             }
         });
     }

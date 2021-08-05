@@ -232,7 +232,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void runScript() {
-        NCMBScript script = new NCMBScript("test.js", NCMBScript.MethodType.GET);
+        NCMBScript script = new NCMBScript("testScript_GET.js", NCMBScript.MethodType.GET);
         JSONObject query = null;
         script.executeInBackground(null, null, null, new ExecuteScriptCallback() {
             @Override

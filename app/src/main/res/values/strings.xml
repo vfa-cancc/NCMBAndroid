@@ -3,7 +3,8 @@
     <!-- Strings related to login -->
     <string name="prompt_email">Email/User name</string>
     <string name="prompt_password">Password</string>
-    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in">Sign in</string>
+    <string name="action_signup">Sign up</string>
     <string name="action_auto_login">Use auto login</string>
     <string name="action_social_login">Social Login</string>
     <string name="action_sign_in_short">Sign in</string>
