@@ -104,7 +104,9 @@ public class MainActivity extends AppCompatActivity {
                 NCMBInstallation.getCurrentInstallation().getDeviceTokenInBackground(new TokenCallback() {
                     @Override
                     public void done(String s, NCMBException e) {
-                        alert("Info", " InstallationID: " + s);
+                        if ( e == null) {
+                            alert("Info", " InstallationID: " + s);
+                        }
                     }
                 });
             }
@@ -171,11 +173,13 @@ public class MainActivity extends AppCompatActivity {
         query.findInBackground(new FindCallback<NCMBObject>() {
             @Override
             public void done(List<NCMBObject> results, NCMBException e) {
-                for (NCMBObject obj : results) {
-                    Log.d("Info", "Object id:" + obj.getObjectId());
+                if (e == null) {
+                    for (NCMBObject obj : results) {
+                        Log.d("Info", "Object id:" + obj.getObjectId());
 
+                    }
+                    alert("Get objects", "Total: " + results.size());
                 }
-                alert("Get objects", "Total: " + results.size());
             }
         });
     }
@@ -222,7 +226,7 @@ public class MainActivity extends AppCompatActivity {
                     if (e == null) {
                         alert("Info", "File content: " + new String(data));
                     } else {
-                        alert("Info", "Get file failure");
+                        alert("Error", "Get file failure");
                     }
                 }
             });
@@ -237,8 +241,10 @@ public class MainActivity extends AppCompatActivity {
         script.executeInBackground(null, null, null, new ExecuteScriptCallback() {
             @Override
             public void done(byte[] result, NCMBException e) {
-                String data = new String(result);
-                alert("Info", "Result: " + data);
+                if (e == null) {
+                    String data = new String(result);
+                    alert("Info", "Result: " + data);
+                }
             }
         });
     }
